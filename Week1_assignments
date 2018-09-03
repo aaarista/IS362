@@ -1,0 +1,81 @@
+# Part 1
+#Question 1
+# This is the count of airplanes with listed speeds
+
+SELECT Count(speed)
+FROM flights.planes
+WHERE speed IS NOT NULL;
+
+# Minimum listed speed
+
+SELECT *
+FROM flights.planes
+WHERE speed IS NOT NULL
+ORDER BY speed asc
+LIMIT 1;
+
+#Maximum listed speed
+
+SELECT *
+FROM flights.planes
+WHERE speed IS NOT NULL
+ORDER BY speed desc
+LIMIT 1;
+
+# Question 2
+#Total distance of all flights in Jan 2013.
+
+SELECT sum(distance)
+FROM flights.flights
+WHERE year = 2013 AND month = 1;
+
+
+# Total distance flown in Jan 2013 where tailnum is missing. 
+
+SELECT sum(distance)
+FROM flights.flights
+WHERE year = 2013 AND month = 1 AND tailnum IS NULL;
+
+# Question 3
+# Total distance flown on July 5, 2013 - grouped by manufacturer using inner join.
+
+SELECT planes.manufacturer, sum(flights.distance)
+FROM flights.flights
+INNER JOIN flights.planes 
+ON flights.tailnum = planes.tailnum
+WHERE flights.year = 2013 AND flights.month = 7 AND flights.day = 5
+GROUP by planes.manufacturer;
+
+# Total distance flown on July 5, 2013 - grouped by manufacturer using left join.
+
+SELECT planes.manufacturer, sum(flights.distance)
+FROM flights.flights
+LEFT JOIN flights.planes 
+ON flights.tailnum = planes.tailnum
+WHERE flights.year = 2013 AND flights.month = 7 AND flights.day = 5
+GROUP by planes.manufacturer;
+
+
+# Question 4
+# Count of flights by carrier AA that took off from each airport in the month of July.
+
+SELECT count(flights.flights.flight), flights.airports.faa , flights.airports.name 
+FROM flights.flights
+inner join flights.airlines 
+on flights.flights.carrier = flights.airlines.carrier 
+inner join flights.airports on flights.flights.origin= flights.airports.faa
+where flights.airlines.carrier = "AA" and flights.flights.month = 7
+GROUP BY flights.airports.faa, flights.airports.name;
+
+# Part 2
+# Average air time and average delay of flights by carrier by month.
+
+SELECT flights.flights.month, flights.flights.carrier, flights.airlines.name, count(flights.flights.carrier) as 'number of flights', round(avg(flights.flights.air_time), 0) as 'avg air time', round(avg(flights.flights.arr_delay), 0) as 'avg delay'
+FROM flights.flights
+INNER JOIN flights.airlines
+ON flights.flights.carrier = flights.airlines.carrier
+GROUP BY flights.flights.month, flights.flights.carrier
+ORDER BY flights.flights.carrier ASC, flights.flights.month ASC;
+
+Tableau Link to viz: https://public.tableau.com/profile/arista4048#!/vizhome/Week1_Viz_/Dashboard1
+
